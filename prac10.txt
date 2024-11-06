@@ -1,0 +1,719 @@
+records> db.customers.insertOne({Username:"Amit",Email:"amit@gmail.com",Age:25,Amount:4000});
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c6715cf6a98f98186b01e')
+}
+records> db.customers.find()
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 25,
+    Amount: 4000
+  }
+]
+records> db.customers.insertMany([{Username:"John",Email:"john@yahoo.com",Age:35,Amount:6000},{Username:"Jack",Email:"jack@gmail.com",Age:26,Amount:3000},{Username:"Riya",Email:"riya@yahoo.com",Age:28,Amount:5500}]);
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId('671c67fccf6a98f98186b01f'),
+    '1': ObjectId('671c67fccf6a98f98186b020'),
+    '2': ObjectId('671c67fccf6a98f98186b021')
+  }
+}
+records> db.customers.find()
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 25,
+    Amount: 4000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 26,
+    Amount: 3000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.findOne()
+{
+  _id: ObjectId('671c6715cf6a98f98186b01e'),
+  Username: 'Amit',
+  Email: 'amit@gmail.com',
+  Age: 25,
+  Amount: 4000
+}
+records> db.customers.find().count()
+4
+records> db.customers.find({Amount:5000}).count()
+0
+records> db.customers.find({Amount:5500}).count()
+1
+records> db.customers.find({Amount:5500})
+[
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.findOne({Amount:5500})
+{
+  _id: ObjectId('671c67fccf6a98f98186b021'),
+  Username: 'Riya',
+  Email: 'riya@yahoo.com',
+  Age: 28,
+  Amount: 5500
+}
+records> db.customers.find({Amount:{$gte:5000}});
+[
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.find({Amount:{$gte:5500}});
+[
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.find({Amount:{$gt:5500}});
+[
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  }
+]
+records> db.customers.find({Amount:{$lt:5500}});
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 25,
+    Amount: 4000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 26,
+    Amount: 3000
+  }
+]
+records> db.customers.find({Amount:{$lte:5500}});
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 25,
+    Amount: 4000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 26,
+    Amount: 3000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.findOne({Amount:{$lte:5500}});
+{
+  _id: ObjectId('671c6715cf6a98f98186b01e'),
+  Username: 'Amit',
+  Email: 'amit@gmail.com',
+  Age: 25,
+  Amount: 4000
+}
+records> db.customers.findOne({Amount:{$gte:5000}})
+{
+  _id: ObjectId('671c67fccf6a98f98186b01f'),
+  Username: 'John',
+  Email: 'john@yahoo.com',
+  Age: 35,
+  Amount: 6000
+}
+
+
+records> db.customers.updateOne({Username:"Amit"},{$set:{Age:26}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 26,
+    Amount: 4000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 26,
+    Amount: 3000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+
+records> db.customers.updateMany({Age:26},{$set:{Age:27,Amount:4500}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 2,
+  modifiedCount: 2,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 4500
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+
+records> db.customers.updateOne({Username:"Amit"},{$set:{Amount:5000,no_of_items:2}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500
+  }
+]
+records> db.customers.updateMany({$or:[{Username:"John"},{Username:"Jack"},{Username:"Riya"}]},{$set:{no_of_items:4}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 3,
+  modifiedCount: 3,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  }
+]
+records> db.customers.updateOne({Username:"Amit"},{$set:{Amount:5000,no_of_items:5}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  }
+]
+records> db.customers.updateOne({Username:"Jack"},{$set:{no_of_items:2}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'John',
+    Email: 'john@yahoo.com',
+    Age: 35,
+    Amount: 6000,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  }
+]
+records> db.customers.replaceOne({Username:"John"},{Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  }
+]
+records> db.customers.insertOne({Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c705fcf6a98f98186b022')
+}
+records> db.customers.insertOne({Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c7061cf6a98f98186b023')
+}
+records> db.customers.insertOne({Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c7061cf6a98f98186b024')
+}
+records> db.customers.insertOne({Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c7062cf6a98f98186b025')
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b01f'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c705fcf6a98f98186b022'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c7061cf6a98f98186b023'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c7061cf6a98f98186b024'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c7062cf6a98f98186b025'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  }
+]
+records> db.customers.deleteOne({Username:"Jane"})
+{ acknowledged: true, deletedCount: 1 }
+records> db.customers.deleteOne({Username:"Jane"})
+{ acknowledged: true, deletedCount: 1 }
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c7061cf6a98f98186b023'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c7061cf6a98f98186b024'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  },
+  {
+    _id: ObjectId('671c7062cf6a98f98186b025'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  }
+]
+records> db.customers.deleteMany({Username:"Jane"})
+{ acknowledged: true, deletedCount: 3 }
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  }
+]
+records> db.customers.insertOne({Username:"Jane",Email:"jane@yahoo.com",Age:30,Amount:6500,no_of_items:6})
+{
+  acknowledged: true,
+  insertedId: ObjectId('671c70aecf6a98f98186b026')
+}
+records> db.customers.find();
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b021'),
+    Username: 'Riya',
+    Email: 'riya@yahoo.com',
+    Age: 28,
+    Amount: 5500,
+    no_of_items: 4
+  },
+  {
+    _id: ObjectId('671c70aecf6a98f98186b026'),
+    Username: 'Jane',
+    Email: 'jane@yahoo.com',
+    Age: 30,
+    Amount: 6500,
+    no_of_items: 6
+  }
+]
+records> db.customers.find().limit(2);
+[
+  {
+    _id: ObjectId('671c6715cf6a98f98186b01e'),
+    Username: 'Amit',
+    Email: 'amit@gmail.com',
+    Age: 27,
+    Amount: 5000,
+    no_of_items: 5
+  },
+  {
+    _id: ObjectId('671c67fccf6a98f98186b020'),
+    Username: 'Jack',
+    Email: 'jack@gmail.com',
+    Age: 27,
+    Amount: 4500,
+    no_of_items: 2
+  }
+]
+records> db.customers.find({},{Username:1,_id:0})
+[
+  { Username: 'Amit' },
+  { Username: 'Jack' },
+  { Username: 'Riya' },
+  { Username: 'Jane' }
+]

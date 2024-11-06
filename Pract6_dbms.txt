@@ -1,0 +1,55 @@
+DELIMITER $
+CREATE PROCEDURE Proc()
+BEGIN
+    DECLARE v_name VARCHAR(100);
+    DECLARE v_total INT;
+    DECLARE v_class VARCHAR(100);
+    DECLARE v_done BOOLEAN DEFAULT FALSE;
+
+    DECLARE stud_cursor CURSOR FOR
+    SELECT Name, Total_marks FROM Stud_Marks;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION SELECT 'An error occurred';
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+
+    OPEN stud_cursor;
+    grade_loop: LOOP
+        FETCH stud_cursor INTO v_name, v_total;
+        IF v_done THEN
+            LEAVE grade_loop;
+        END IF;
+
+        IF v_total BETWEEN 990 AND 1500 THEN
+            SET v_class = 'Distinction';
+        ELSEIF v_total BETWEEN 900 AND 989 THEN
+            SET v_class = 'First Class';
+        ELSEIF v_total BETWEEN 825 AND 899 THEN
+            SET v_class = 'Higher Second Class';
+        ELSE
+            SET v_class = 'No Class';
+        END IF;
+
+        INSERT INTO RESULT (Name, Class) VALUES (v_name, v_class);
+    END LOOP;
+    CLOSE stud_cursor;
+END;
+$
+DELIMITER ;
+
+CREATE FUNCTION func_GetGrade(p_marks INT)
+RETURNS VARCHAR(50)
+DETERMINISTIC
+BEGIN
+    DECLARE v_grade VARCHAR(50);
+   
+    SET v_grade = CASE
+        WHEN p_marks >= 990 AND p_marks <= 1500 THEN 'Distinction'
+        WHEN p_marks >= 900 AND p_marks <= 989 THEN 'First Class'
+        WHEN p_marks >= 825 AND p_marks <= 899 THEN 'Higher Second Class'
+        ELSE 'No Grade'
+    END;
+   
+    RETURN v_grade;
+END $$
+
+DELIMITER ;

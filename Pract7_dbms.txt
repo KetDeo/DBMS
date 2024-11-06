@@ -1,0 +1,202 @@
+create database prac7;
+use prac7;
+-- Create the required tables
+CREATE TABLE O_RollCall (
+    Roll_No INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Class VARCHAR(50)
+);
+
+CREATE TABLE N_RollCall (
+    Roll_No INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Class VARCHAR(50)
+);
+
+DELIMITER $$
+
+CREATE PROCEDURE MergeRollCallParam(
+    IN p_class VARCHAR(50)
+)
+BEGIN
+    -- Declare variables
+    DECLARE v_roll INT;
+    DECLARE v_name VARCHAR(100);
+    DECLARE v_class VARCHAR(50);
+    DECLARE v_done INT DEFAULT FALSE;
+    DECLARE v_count INT;
+   
+    -- Declare cursor (MySQL style)
+    DECLARE cur_new_records CURSOR FOR
+        SELECT Roll_No, Name, Class
+        FROM N_RollCall
+        WHERE Class = p_class;
+   
+    -- Declare handlers
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+   
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error occurred during merge operation' AS message;
+    END;
+   
+    -- Start transaction
+    START TRANSACTION;
+   
+    -- Open cursor
+    OPEN cur_new_records;
+   
+    merge_loop: LOOP
+        FETCH cur_new_records INTO v_roll, v_name, v_class;
+       
+        IF v_done THEN
+            LEAVE merge_loop;
+        END IF;
+       
+        -- Check if record exists in O_RollCall
+        SELECT COUNT(*) INTO v_count
+        FROM O_RollCall
+        WHERE Roll_No = v_roll;
+       
+        -- Insert if record doesn't exist
+        IF v_count = 0 THEN
+            INSERT INTO O_RollCall(Roll_No, Name, Class)
+            VALUES (v_roll, v_name, v_class);
+        END IF;
+    END LOOP;
+   
+    CLOSE cur_new_records;
+   
+    COMMIT;
+   
+    -- Show number of records merged
+    SELECT CONCAT('Records merged for class: ', p_class) AS message;
+END $$
+
+
+
+-- 2. Explicit Cursor Example
+CREATE PROCEDURE MergeRollCallExplicit()
+BEGIN
+    -- Declare variables
+    DECLARE v_roll INT;
+    DECLARE v_name VARCHAR(100);
+    DECLARE v_class VARCHAR(50);
+    DECLARE v_done INT DEFAULT FALSE;
+    DECLARE v_count INT;
+   
+    -- Declare explicit cursor
+    DECLARE cur_all_records CURSOR FOR
+        SELECT Roll_No, Name, Class
+        FROM N_RollCall;
+   
+    -- Declare handlers
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+   
+    -- Start transaction
+    START TRANSACTION;
+   
+    OPEN cur_all_records;
+   
+    fetch_loop: LOOP
+        FETCH cur_all_records INTO v_roll, v_name, v_class;
+       
+        IF v_done THEN
+            LEAVE fetch_loop;
+        END IF;
+       
+        -- Check if record exists
+        SELECT COUNT(*) INTO v_count
+        FROM O_RollCall
+        WHERE Roll_No = v_roll;
+       
+        -- Insert if doesn't exist
+        IF v_count = 0 THEN
+            INSERT INTO O_RollCall(Roll_No, Name, Class)
+            VALUES (v_roll, v_name, v_class);
+        END IF;
+    END LOOP;
+   
+    CLOSE cur_all_records;
+   
+    COMMIT;
+END $$
+
+-- 3. Cursor FOR Loop Example (Using prepared statement as MySQL doesn't support direct cursor FOR loops)
+CREATE PROCEDURE MergeRollCallForLoop()
+BEGIN
+    DECLARE v_done INT DEFAULT FALSE;
+    DECLARE v_count INT;
+   
+    -- Start transaction
+    START TRANSACTION;
+   
+    -- Using INSERT ... SELECT with NOT EXISTS (simulating cursor FOR loop behavior)
+    INSERT INTO O_RollCall (Roll_No, Name, Class)
+    SELECT n.Roll_No, n.Name, n.Class
+    FROM N_RollCall n
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM O_RollCall o
+        WHERE o.Roll_No = n.Roll_No
+    );
+   
+    COMMIT;
+END $$
+
+-- 4. Implicit Cursor Example (Using simple INSERT ... SELECT)
+CREATE PROCEDURE MergeRollCallImplicit()
+BEGIN
+    DECLARE v_rows_affected INT;
+   
+    -- Start transaction
+    START TRANSACTION;
+   
+    -- Implicit cursor operation
+    INSERT INTO O_RollCall (Roll_No, Name, Class)
+    SELECT n.Roll_No, n.Name, n.Class
+    FROM N_RollCall n
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM O_RollCall o
+        WHERE o.Roll_No = n.Roll_No
+    );
+   
+    -- Get number of rows affected
+    SET v_rows_affected = ROW_COUNT();
+   
+    COMMIT;
+   
+    -- Return number of rows merged
+    SELECT CONCAT(v_rows_affected, ' records merged') AS result;
+END $$
+
+DELIMITER ;
+
+
+-- Insert test data
+INSERT INTO O_RollCall VALUES
+(1, 'John Doe', 'Class A'),
+(2, 'Jane Smith', 'Class A');
+
+INSERT INTO N_RollCall VALUES
+(1, 'John Doe', 'Class A'),
+(2, 'Jane Smith', 'Class A'),
+(3, 'Bob Wilson', 'Class A'),
+(4, 'Alice Brown', 'Class B');
+
+-- Call the procedure for Class A
+CALL MergeRollCallParam('Class A');
+
+-- Check results
+SELECT * FROM O_RollCall ORDER BY Roll_No;
+
+-- Test with empty class
+CALL MergeRollCallParam('Class C');
+
+-- Test with existing class
+CALL MergeRollCallParam('Class B');
+
+-- Check final results
+SELECT * FROM O_RollCall ORDER BY Roll_No;

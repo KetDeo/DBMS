@@ -1,0 +1,115 @@
+-- List all doctors who have appointment on 2024-07-12
+SELECT DR_NAME
+FROM DOCTOR
+WHERE DR_ID IN (
+ SELECT DR_ID
+ FROM APPOINTMENT
+ WHERE DATE = '2024-07-12'
+);
+-- Find the total cost of prescriptions for patients who have appointments in July
+2024
+SELECT SUM(COST) AS TotalCost
+FROM PRESC
+WHERE PAT_ID IN (
+ SELECT PAT_ID
+ FROM APPOINTMENT
+ WHERE DATE BETWEEN '2024-07-01' AND '2024-07-31'
+);
+-- List all hospitals that have more than one department
+SELECT HOSPITAL_NAME, HOSPITAL_ADD, HOSPITAL_PHNO
+FROM HOSPITAL
+WHERE HOSPITAL_ID IN (
+ SELECT HOSPITAL_ID
+ FROM DEPT
+ GROUP BY HOSPITAL_ID
+ HAVING COUNT(DEPT_ID) > 1
+);
+6
+-- Find all staff members who work in hospitals that have the highest number of
+departments
+SELECT STAFF_NAME, STAFF_PHNO, DEPT_ID
+FROM STAFF
+WHERE DEPT_ID IN (
+ SELECT DEPT_ID
+ FROM DEPT
+ WHERE HOSPITAL_ID = (
+ SELECT HOSPITAL_ID
+ FROM DEPT
+ GROUP BY HOSPITAL_ID
+ ORDER BY COUNT(*) DESC
+ LIMIT 1
+ )
+);
+-- List all doctors who belong to departments located in a specific hospital
+SELECT DR_NAME, DR_PHNO
+FROM DOCTOR
+WHERE DEPT_ID IN (
+ SELECT DEPT_ID
+ FROM DEPT
+ WHERE HOSPITAL_ID = (
+ SELECT HOSPITAL_ID
+ FROM HOSPITAL
+ WHERE HOSPITAL_NAME = 'Pune Hospital'
+ )
+);
+7
+JOINS
+-- Find the details of patients along with their appointment details
+SELECT
+PATIENT.PAT_ID, PATIENT.PAT_NAME, APPOINTMENT.DATE,
+APPOINTMENT.TIME
+FROM PATIENT
+INNER JOIN APPOINTMENT
+ON PATIENT.PAT_ID = APPOINTMENT.PAT_ID;
+-- Find all patients and their appointment details (if they have any appointments)
+SELECT
+ PATIENT.PAT_ID, PATIENT.PAT_NAME, APPOINTMENT.DATE,
+APPOINTMENT.TIME
+FROM PATIENT
+LEFT JOIN APPOINTMENT
+ON PATIENT.PAT_ID = APPOINTMENT.PAT_ID;
+8
+-- Find all appointments and their corresponding patient details (if any)
+SELECT
+ PATIENT.PAT_ID, PATIENT.PAT_NAME, APPOINTMENT.DATE,
+APPOINTMENT.TIME
+FROM APPOINTMENT
+RIGHT JOIN PATIENT
+ON PATIENT.PAT_ID = APPOINTMENT.PAT_ID;
+-- Get a list of all departments along with the hospital they belong to
+SELECT
+ DP.DEPT_NAME AS Department,
+ H.HOSPITAL_NAME AS Hospital
+FROM DEPT DP
+JOIN HOSPITAL H
+ON DP.H_ID = H.HOSPITAL_ID;
+9
+-- Get details of staff members, including their department names and the
+hospital names
+SELECT
+ STAFF.STAFF_ID,
+ STAFF.STAFF_NAME,
+ STAFF.Staff_PHNO,
+ DEPT.DEPT_NAME,
+ HOSPITAL.HOSPITAL_NAME
+FROM STAFF
+INNER JOIN
+ DEPT ON STAFF.DEPT_ID = DEPT.DEPT_ID
+INNER JOIN
+ HOSPITAL ON DEPT.HOSPITAL_ID = HOSPITAL.HOSPITAL_ID;
+-- Find all patients and their appointment details, including patients without
+appointments and appointments without patients
+SELECT
+PATIENT.PAT_ID, PATIENT.PAT_NAME, APPOINTMENT.DATE,
+APPOINTMENT.TIME
+FROM PATIENT
+LEFT JOIN APPOINTMENT ON
+PATIENT.PAT_ID = APPOINTMENT.PAT_ID
+1
+0
+UNION
+SELECT PATIENT.PAT_ID, PATIENT.PAT_NAME,
+APPOINTMENT.DATE, APPOINTMENT.TIME
+FROM APPOINTMENT
+RIGHT JOIN PATIENT ON
+PATIENT.PAT_ID = APPOINTMENT.PAT_ID;

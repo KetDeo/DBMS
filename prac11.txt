@@ -1,0 +1,295 @@
+db.collection.aggregate(pipeline,options)
+
+db.collection.aggregate([{$group:{_id:"$age",names:{$push:"$name"} }}]) //Groups by age and displays names
+
+db.collection.aggregate([{$group:{_id:"$age",students:{$push:"$$ROOT"} }}]) //Represents the entire document and not just names
+
+db.collection.aggregate([{$match:{gender:"male"}}, {$group:{_id:"$age",number:{$sum:1}}}]) //Counts male teachers per age group
+
+//Give a count per age of male students and sort them by count in desc manner
+db.collection.aggregate([
+    {$match:{gender:"male"}},
+    {$group:{_id:"$age",numberofStudents:{$sum:1}}},
+    {$sort:{numberofStudents:-1}}
+])
+
+CODE:
+
+db.teachers.insertMany([
+    { "_id": 1, "name": "John Doe", "age": 35, "gender": "male" },
+    { "_id": 2, "name": "Jane Smith", "age": 40, "gender": "female" },
+    { "_id": 3, "name": "Michael Johnson", "age": 45, "gender": "male" },
+    { "_id": 4, "name": "Emily Williams", "age": 30, "gender": "female" },
+    { "_id": 5, "name": "Robert Brown", "age": 38, "gender": "male" },
+    { "_id": 6, "name": "Emma Jones", "age": 33, "gender": "female" },
+    { "_id": 7, "name": "William Davis", "age": 37, "gender": "male" },
+    { "_id": 8, "name": "Olivia Miller", "age": 41, "gender": "female" },
+    { "_id": 9, "name": "David Wilson", "age": 36, "gender": "male" },
+    { "_id": 10, "name": "Sophia Moore", "age": 32, "gender": "female" },
+    { "_id": 11, "name": "Richard Taylor", "age": 39, "gender": "male" },
+    { "_id": 12, "name": "Isabella Anderson", "age": 43, "gender": "female" },
+    { "_id": 13, "name": "Joseph Thomas", "age": 34, "gender": "male" },
+    { "_id": 14, "name": "Mia Jackson", "age": 42, "gender": "female" },
+    { "_id": 15, "name": "Charles White", "age": 36, "gender": "male" },
+    { "_id": 16, "name": "Abigail Harris", "age": 31, "gender": "female" },
+    { "_id": 17, "name": "Daniel Martin", "age": 44, "gender": "male" },
+    { "_id": 18, "name": "Evelyn Thompson", "age": 38, "gender": "female" },
+    { "_id": 19, "name": "Matthew Garcia", "age": 37, "gender": "male" },
+    { "_id": 20, "name": "Sofia Martinez", "age": 35, "gender": "female" },
+    { "_id": 21, "name": "Andrew Robinson", "age": 40, "gender": "male" },
+    { "_id": 22, "name": "Grace Clark", "age": 33, "gender": "female" },
+    { "_id": 23, "name": "Joshua Rodriguez", "age": 39, "gender": "male" },
+    { "_id": 24, "name": "Avery Lewis", "age": 42, "gender": "female" },
+    { "_id": 25, "name": "Christopher Lee", "age": 37, "gender": "male" },
+    { "_id": 26, "name": "Chloe Walker", "age": 31, "gender": "female" },
+    { "_id": 27, "name": "Kevin Hall", "age": 44, "gender": "male" },
+    { "_id": 28, "name": "Zoey Allen", "age": 38, "gender": "female" },
+    { "_id": 29, "name": "Brian Young", "age": 36, "gender": "male" },
+    { "_id": 30, "name": "Harper King", "age": 34, "gender": "female" }
+])
+
+school> db.teachers.aggregate([{$group:{_id:"$age",names:{$push:"$name"}}}])
+[
+  { _id: 35, names: [ 'John Doe', 'Sofia Martinez' ] },
+  {
+    _id: 38,
+    names: [ 'Robert Brown', 'Evelyn Thompson', 'Zoey Allen' ]
+  },
+  { _id: 32, names: [ 'Sophia Moore' ] },
+  { _id: 41, names: [ 'Olivia Miller' ] },
+  { _id: 33, names: [ 'Emma Jones', 'Grace Clark' ] },
+  { _id: 30, names: [ 'Emily Williams' ] },
+  { _id: 31, names: [ 'Abigail Harris', 'Chloe Walker' ] },
+  {
+    _id: 37,
+    names: [ 'William Davis', 'Matthew Garcia', 'Christopher Lee' ]
+  },
+  { _id: 39, names: [ 'Richard Taylor', 'Joshua Rodriguez' ] },
+  {
+    _id: 36,
+    names: [ 'David Wilson', 'Charles White', 'Brian Young' ]
+  },
+  { _id: 40, names: [ 'Jane Smith', 'Andrew Robinson' ] },
+  { _id: 43, names: [ 'Isabella Anderson' ] },
+  { _id: 34, names: [ 'Joseph Thomas', 'Harper King' ] },
+  { _id: 42, names: [ 'Mia Jackson', 'Avery Lewis' ] },
+  { _id: 45, names: [ 'Michael Johnson' ] },
+  { _id: 44, names: [ 'Daniel Martin', 'Kevin Hall' ] }
+]
+
+school> db.teachers.aggregate([{$group:{_id:null,Total_age:{$sum:"$age"}}}])
+[ { _id: null, Total_age: 1120 } ]
+
+school> db.teachers.aggregate([{$match:{gender:"male"}},{$group:{_id:null,Total_age:{$sum:"$age"}}}])
+[ { _id: null, Total_age: 577 } ]
+
+school> db.teachers.aggregate([{$match:{gender:"female"}},{$group:{_id:null,Total_age:{$sum:"$age"}}}])
+[ { _id: null, Total_age: 543 } ]
+
+school> db.teachers.createIndex({age:2})
+age_2
+
+school> db.teachers.getIndexes()
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { age: 2 }, name: 'age_2' }
+]
+
+school> db.teachers.aggregate([{$group:{_id:null,Avg_age:{$avg:"$age"}}}])
+[ { _id: null, Avg_age: 37.333333333333336 } ]
+
+school> db.teachers.aggregate([{$match:{gender:"female"}},{$group:{_id:null,Avg_age:{$avg:"$age"}}}])
+[ { _id: null, Avg_age: 36.2 } ]
+
+school> db.teachers.aggregate([{$match:{gender:"male"}},{$group:{_id:null,Avg_age:{$avg:"$age"}}}])
+[ { _id: null, Avg_age: 38.46666666666667 } ]
+
+
+
+Separate code
+
+practice> db.class.aggregate([{$group:{_id:null,sum_marks:{$sum:"$marks"}}}])
+[ { _id: null, sum_marks: 249 } ]
+practice> db.class.aggregate([{$group:{_id:null,avg_marks:{$avg:"$marks"}}}])
+[ { _id: null, avg_marks: 49.8 } ]
+practice> db.class.aggregate([{$group:{_id:null,min_marks:{$min:"$marks"}}}])
+[ { _id: null, min_marks: 48 } ]
+practice> db.class.aggregate([{$group:{_id:null,max_marks:{$max:"$marks"}}}])
+[ { _id: null, max_marks: 51 } ]
+
+Indexes
+
+practice> db.createIndex({marks:1})
+practice> db.class.getIndexes()
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { marks: 1 }, name: 'marks_1' },
+  { v: 2, key: { marks: 1, age: 1 }, name: 'marks_1_age_1' }
+]
+
+practice> db.class.find({marks:{$gte:49}}).explain()
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'practice.class',
+    parsedQuery: { marks: { '$gte': 49 } },
+    indexFilterSet: false,
+    queryHash: '50FCA839',
+    planCacheKey: '5E5F5E88',
+    optimizationTimeMillis: 0,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    prunedSimilarIndexes: true,
+    winningPlan: {
+      isCached: false,
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: { marks: 1 },
+        indexName: 'marks_1',
+        isMultiKey: false,
+        multiKeyPaths: { marks: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: { marks: [ '[49, inf.0]' ] }
+      }
+    },
+    rejectedPlans: []
+  },
+  command: {
+    find: 'class',
+    filter: { marks: { '$gte': 49 } },
+    '$db': 'practice'
+  },
+  serverInfo: {
+    host: 'DESKTOP-D750KUG',
+    port: 27017,
+    version: '8.0.0',
+    gitVersion: 'd7cd03b239ac39a3c7d63f7145e91aca36f93db6'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  ok: 1
+}
+
+practice> db.class.find({marks:{$gte:49}}).explain("executionStats")
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'practice.class',
+    parsedQuery: { marks: { '$gte': 49 } },
+    indexFilterSet: false,
+    queryHash: '50FCA839',
+    planCacheKey: '5E5F5E88',
+    optimizationTimeMillis: 0,
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    prunedSimilarIndexes: true,
+    winningPlan: {
+      isCached: false,
+      stage: 'FETCH',
+      inputStage: {
+        stage: 'IXSCAN',
+        keyPattern: { marks: 1 },
+        indexName: 'marks_1',
+        isMultiKey: false,
+        multiKeyPaths: { marks: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: { marks: [ '[49, inf.0]' ] }
+      }
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 4,
+    executionTimeMillis: 1,
+    totalKeysExamined: 4,
+    totalDocsExamined: 4,
+    executionStages: {
+      isCached: false,
+      stage: 'FETCH',
+      nReturned: 4,
+      executionTimeMillisEstimate: 0,
+      works: 5,
+      advanced: 4,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      docsExamined: 4,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        nReturned: 4,
+        executionTimeMillisEstimate: 0,
+        works: 5,
+        advanced: 4,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 1,
+        keyPattern: { marks: 1 },
+        indexName: 'marks_1',
+        isMultiKey: false,
+        multiKeyPaths: { marks: [] },
+        isUnique: false,
+        isSparse: false,
+        isPartial: false,
+        indexVersion: 2,
+        direction: 'forward',
+        indexBounds: { marks: [ '[49, inf.0]' ] },
+        keysExamined: 4,
+        seeks: 1,
+        dupsTested: 0,
+        dupsDropped: 0
+      }
+    }
+  },
+  command: {
+    find: 'class',
+    filter: { marks: { '$gte': 49 } },
+    '$db': 'practice'
+  },
+  serverInfo: {
+    host: 'DESKTOP-D750KUG',
+    port: 27017,
+    version: '8.0.0',
+    gitVersion: 'd7cd03b239ac39a3c7d63f7145e91aca36f93db6'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted',
+    internalQueryPlannerIgnoreIndexWithCollationForRegex: 1
+  },
+  ok: 1
+}
+
