@@ -1,0 +1,99 @@
+To showcase normalization (1NF, 2NF, and 3NF), let's start by creating a hypothetical **Unnormalized Form (UNF)** for the `HOSPITALDB` database with some redundant entries, then step-by-step normalize it. Each level of normalization removes redundancy or dependency issues.
+
+### Step 1: Unnormalized Form (UNF)
+
+In the **UNF**, there are no strict rules about atomic values, and repeated or grouped data might be present within a single field. Here’s an example:
+
+| HOSPITAL_ID | HOSPITAL_NAME | HOSPITAL_ADD       | HOSPITAL_PHNO | DEPT_ID | DEPT_NAME          | STAFF_ID | STAFF_NAME           | STAFF_PHNO   | DR_ID | DR_NAME            | DR_PHNO     | PAT_ID | PAT_NAME      | PAT_PHNO    | DATE       | TIME   | MED_NAME                       | COST  |
+|-------------|---------------|--------------------|---------------|---------|--------------------|----------|-----------------------|--------------|-------|--------------------|-------------|--------|---------------|-------------|------------|--------|--------------------------------|-------|
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 101     | Cardiology         | 1001     | Dr. Alice Johnson     | 555-1111     | 201   | Dr. Bob Smith      | 555-2222    | 301    | John Doe      | 555-3333    | 2024-11-10 | 10:00  | Aspirin, Ibuprofen             | 50.00 |
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 102     | Neurology          | 1002     | Nurse Lily Anderson   | 555-4444     | 202   | Dr. Eva Green      | 555-5555    | 302    | Jane Roe      | 555-6666    | 2024-11-11 | 11:30  | Paracetamol, Amoxicillin       | 80.00 |
+| 2           | General Clinic| 456 Maple Ave     | 987-654-3210  | 201     | Orthopedics        | 1003     | Dr. Charlie Brown     | 555-7777     | 203   | Dr. Dave Wilson    | 555-8888    | 301    | John Doe      | 555-3333    | 2024-11-12 | 09:30  | Ibuprofen, Diclofenac          | 45.00 |
+
+In this UNF:
+- Data is not atomic: `MED_NAME` contains multiple medications in a single field.
+- Redundancies are present: Hospital, department, staff, doctor, and patient information is repeated across multiple rows.
+
+### Step 2: First Normal Form (1NF)
+
+In **1NF**, all attributes should contain **atomic values**, and there should be no repeating groups or arrays. Let’s break down each repeating group into separate rows.
+
+| HOSPITAL_ID | HOSPITAL_NAME | HOSPITAL_ADD       | HOSPITAL_PHNO | DEPT_ID | DEPT_NAME          | STAFF_ID | STAFF_NAME           | STAFF_PHNO   | DR_ID | DR_NAME            | DR_PHNO     | PAT_ID | PAT_NAME      | PAT_PHNO    | DATE       | TIME   | MED_NAME     | COST  |
+|-------------|---------------|--------------------|---------------|---------|--------------------|----------|-----------------------|--------------|-------|--------------------|-------------|--------|---------------|-------------|------------|--------|--------------|-------|
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 101     | Cardiology         | 1001     | Dr. Alice Johnson     | 555-1111     | 201   | Dr. Bob Smith      | 555-2222    | 301    | John Doe      | 555-3333    | 2024-11-10 | 10:00  | Aspirin      | 25.00 |
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 101     | Cardiology         | 1001     | Dr. Alice Johnson     | 555-1111     | 201   | Dr. Bob Smith      | 555-2222    | 301    | John Doe      | 555-3333    | 2024-11-10 | 10:00  | Ibuprofen    | 25.00 |
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 102     | Neurology          | 1002     | Nurse Lily Anderson   | 555-4444     | 202   | Dr. Eva Green      | 555-5555    | 302    | Jane Roe      | 555-6666    | 2024-11-11 | 11:30  | Paracetamol  | 40.00 |
+| 1           | City Hospital | 123 Main St       | 123-456-7890  | 102     | Neurology          | 1002     | Nurse Lily Anderson   | 555-4444     | 202   | Dr. Eva Green      | 555-5555    | 302    | Jane Roe      | 555-6666    | 2024-11-11 | 11:30  | Amoxicillin  | 40.00 |
+| 2           | General Clinic| 456 Maple Ave     | 987-654-3210  | 201     | Orthopedics        | 1003     | Dr. Charlie Brown     | 555-7777     | 203   | Dr. Dave Wilson    | 555-8888    | 301    | John Doe      | 555-3333    | 2024-11-12 | 09:30  | Ibuprofen    | 22.50 |
+| 2           | General Clinic| 456 Maple Ave     | 987-654-3210  | 201     | Orthopedics        | 1003     | Dr. Charlie Brown     | 555-7777     | 203   | Dr. Dave Wilson    | 555-8888    | 301    | John Doe      | 555-3333    | 2024-11-12 | 09:30  | Diclofenac   | 22.50 |
+
+### Step 3: Second Normal Form (2NF)
+
+In **2NF**, we remove **partial dependencies**—attributes that depend only on part of a composite primary key. To achieve this, split the table based on primary keys.
+
+#### Separate Tables in 2NF
+
+1. **HOSPITAL Table**
+
+   | HOSPITAL_ID | HOSPITAL_NAME | HOSPITAL_ADD       | HOSPITAL_PHNO |
+   |-------------|---------------|--------------------|---------------|
+   | 1           | City Hospital | 123 Main St       | 123-456-7890  |
+   | 2           | General Clinic| 456 Maple Ave     | 987-654-3210  |
+
+2. **DEPT Table**
+
+   | DEPT_ID | DEPT_NAME    | HOSPITAL_ID |
+   |---------|--------------|-------------|
+   | 101     | Cardiology   | 1           |
+   | 102     | Neurology    | 1           |
+   | 201     | Orthopedics  | 2           |
+
+3. **STAFF Table**
+
+   | STAFF_ID | STAFF_NAME         | STAFF_PHNO | DEPT_ID |
+   |----------|---------------------|------------|---------|
+   | 1001     | Dr. Alice Johnson   | 555-1111   | 101     |
+   | 1002     | Nurse Lily Anderson | 555-4444   | 102     |
+   | 1003     | Dr. Charlie Brown   | 555-7777   | 201     |
+
+4. **DOCTOR Table**
+
+   | DR_ID | DR_NAME       | DR_PHNO   | DEPT_ID |
+   |-------|---------------|-----------|---------|
+   | 201   | Dr. Bob Smith | 555-2222  | 101     |
+   | 202   | Dr. Eva Green | 555-5555  | 102     |
+   | 203   | Dr. Dave Wilson| 555-8888 | 201     |
+
+5. **PATIENT Table**
+
+   | PAT_ID | PAT_NAME   | PAT_PHNO  |
+   |--------|------------|-----------|
+   | 301    | John Doe   | 555-3333  |
+   | 302    | Jane Roe   | 555-6666  |
+
+6. **APPOINTMENT Table**
+
+   | APPT_ID | PAT_ID | DR_ID | DATE       | TIME   |
+   |---------|--------|-------|------------|--------|
+   | 1       | 301    | 201   | 2024-11-10 | 10:00  |
+   | 2       | 302    | 202   | 2024-11-11 | 11:30  |
+   | 3       | 301    | 203   | 2024-11-12 | 09:30  |
+
+7. **PRESC Table**
+
+   | PRES_NO | PAT_ID | MED_NAME    | DATE       | COST  |
+   |---------|--------|-------------|------------|-------|
+
+
+   | 1       | 301    | Aspirin     | 2024-11-10 | 25.00 |
+   | 2       | 301    | Ibuprofen   | 2024-11-10 | 25.00 |
+   | 3       | 302    | Paracetamol | 2024-11-11 | 40.00 |
+   | 4       | 302    | Amoxicillin | 2024-11-11 | 40.00 |
+   | 5       | 301    | Ibuprofen   | 2024-11-12 | 22.50 |
+   | 6       | 301    | Diclofenac  | 2024-11-12 | 22.50 |
+
+### Step 4: Third Normal Form (3NF)
+
+To achieve **3NF**, we remove **transitive dependencies**, ensuring that non-key attributes are dependent only on the primary key.
+
+In this example, since all tables already only contain attributes that depend on the primary key, we have reached **3NF**. Each table's attributes are either primary keys or directly related to the primary key without transitive dependencies.
